@@ -8,10 +8,14 @@ package app.models;
  */
 public class User {
     
-    private String email = null, senha = null, nome = null;
+    private final int id;
+    private String email, senha, nome;
     
-    public User() {}
-    public User(String email, String senha, String nome) {
+    public User(int id) {
+        this.id = id;
+    }
+    public User(int id, String email, String senha, String nome) {
+        this.id = id;
         this.email = email;
         this.senha = senha;
         this.nome = nome;

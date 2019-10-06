@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -12,11 +13,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import app.models.Post;
 /**
  *
  * @author Matheus Max
  */
-public class Post extends Application{
+public class NewPost extends Application{
     
     private AnchorPane pane;
     private Label lbTitulo;
@@ -49,7 +51,7 @@ public class Post extends Application{
         btPostar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                //Postar
+                postar();
             }
         });
         
@@ -72,7 +74,7 @@ public class Post extends Application{
                 Timeline timeline = new Timeline();
                 try{
                     timeline.start(new Stage());
-                    Post.stage.close();
+                    NewPost.stage.close();
                 } catch(Exception e) {
                     e.printStackTrace();
                 }
@@ -136,8 +138,45 @@ public class Post extends Application{
         
         initLayout();
         
-        Post.stage = stage;
+        NewPost.stage = stage;
         
     }
     
+    /* Funções Principais */
+    private void postar() {
+        
+        if(taMessage.getText().trim().isEmpty()) {
+            Alert errorPostar = new Alert(Alert.AlertType.ERROR);
+            errorPostar.setContentText("O campo de texto está vazio.");
+            errorPostar.setTitle("Falha em Postar");
+            errorPostar.setHeaderText(null);
+            errorPostar.showAndWait();
+        } else {
+            Alert successPostar = new Alert(Alert.AlertType.CONFIRMATION);
+            successPostar.setContentText("Postagem realizada com sucesso.");
+            successPostar.setTitle("Postar");
+            successPostar.setHeaderText(null);
+            successPostar.showAndWait();
+            
+            Timeline.getListPosts().addPost(createPost());
+            Timeline timeline = new Timeline();
+            try {
+                timeline.start(new Stage());
+                NewPost.stage.close();
+            } catch(Exception e) {
+                e.printStackTrace();
+                Alert errorPostar = new Alert(Alert.AlertType.ERROR);
+                errorPostar.setContentText("Houve um erro interno na postagem> Por Favor tente mais tarde...");
+                errorPostar.setTitle("Falha em Postar");
+                errorPostar.setHeaderText(null);
+                errorPostar.showAndWait();
+            }
+        }
+        
+    }
+    
+    /* Funções Auxiliares */
+    public Post createPost() {
+        return new Post(taMessage.getText(), Timeline.getLoggedUser());
+    }
 }

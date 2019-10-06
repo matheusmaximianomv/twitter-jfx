@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -16,6 +17,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import app.models.User;
 /**
  *
  * @author Matheus Max
@@ -65,7 +67,7 @@ public class Register extends Application {
         btCadastrar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                //Cadastrar
+                registerUser();
             }
         });
         
@@ -178,4 +180,58 @@ public class Register extends Application {
         
     }
     
+    /* Funções da Aplicação */
+    private void registerUser() {
+        if(!isValidFields()) {
+            Alert errorRegistro = new Alert(Alert.AlertType.ERROR);
+            errorRegistro.setContentText("Alguns campos estão vazios.");
+            errorRegistro.setTitle("Falha no Cadastro");
+            errorRegistro.setHeaderText(null);
+            errorRegistro.showAndWait();
+        } else if(!checkUserValid()) {
+            Alert errorRegistro = new Alert(Alert.AlertType.ERROR);
+            errorRegistro.setContentText("Uma conta com esse email já existe.");
+            errorRegistro.setTitle("Falha no Cadastro");
+            errorRegistro.setHeaderText(null);
+            errorRegistro.showAndWait();
+        } else {
+            Alert successRegistro = new Alert(Alert.AlertType.CONFIRMATION);
+            successRegistro.setContentText("Cadastro realizado com sucesso.");
+            successRegistro.setTitle("Cadastro");
+            successRegistro.setHeaderText(null);
+            successRegistro.showAndWait();
+            
+            Login.getListUsers().addUser(createUser());
+            Login login = new Login();
+            try {
+                login.start(new Stage());
+                Register.stage.close();
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            
+        }
+    }
+    
+    /* Funções Auxiliares */
+    private boolean isValidFields() {
+        if(txEmail.getText().trim().isEmpty() || txPassword.getText().trim().isEmpty() || txUsername.getText().trim().isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+    
+    private boolean checkUserValid() {
+        for(User u : Login.getListUsers().getUsers()) {
+            if(u.getEmail().equals(txEmail.getText())) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    private User createUser() {
+        return new User(Login.getListUsers().getRecords(),txEmail.getText(), txPassword.getText(), txUsername.getText());
+    }
 }

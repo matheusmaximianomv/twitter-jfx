@@ -7,24 +7,18 @@ package app.models;
  */
 public class Post {
     
-    private final String id;
     private String content;
     private User author;
     private long likes = 0;
     
-    public Post(String id) {
-        this.id = id;
+    public Post(User author) {
+        this.author = author;
         likes = 0;
     }
-    public Post(String id, String content, User author) {
-        this.id = id;
+    public Post(String content, User author) {
         this.content = content;
         this.author = author;
         this.likes = 0;
-    }
-    
-    public String getId() {
-        return id;
     }
     
     public String getContent() {

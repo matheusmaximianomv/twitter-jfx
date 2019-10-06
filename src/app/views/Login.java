@@ -16,6 +16,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 
+import app.models.User;
+
+import app.controllers.ListUsers;
+
 /**
  * @author Matheus Maximiano de Melo Vieira
  * @version 1.0.0
@@ -32,6 +36,8 @@ public class Login extends Application {
     private ImageView logo;
     private static Stage stage;
     
+    private static ListUsers listUsers;
+    
     @Override
     public void start(Stage stage) throws Exception {
         
@@ -45,7 +51,8 @@ public class Login extends Application {
         stage.setTitle("Twitter");
         stage.show();
         
-        initLayout();        
+        initLayout();  
+        initUser();
         
         Login.stage = stage;
     }
@@ -185,8 +192,21 @@ public class Login extends Application {
         });
     }
     
+    private void initUser() {
+        
+        listUsers = new ListUsers();
+        User userAdmin = new User(listUsers.getRecords(), "admin@email.com", "javafx", "Matheus Max");
+        listUsers.addUser(userAdmin);
+        
+    }
+    
     public static void main(String[] args) {
         launch(args);
+    }
+    
+    /* Função Estática da Base de Usuários */
+    public static ListUsers getListUsers() {
+        return Login.listUsers;
     }
     
     /* Funções Auxiliares */
@@ -194,27 +214,74 @@ public class Login extends Application {
         button.setStyle(style);
     }
     
+    private User getUserFromList(String email) {
+        for(User u : listUsers.getUsers()) {
+            if(u.getEmail().equals(email)) {
+                return u;
+            }
+        }
+        
+        return null;
+    }
+    
+    /* Funções para Autenticação */
+    private boolean checkUserRecords() {
+        if(listUsers.getRecords() == 0) {
+            return false;
+        }
+        return true;
+    }
+    
+    private boolean checkRegisteredUser(String email, String senha) {
+        
+        for(User u : listUsers.getUsers()) {
+            if(u.getEmail().equals(email)) {
+                if(u.getSenha().equals(senha)) {
+                    return true;
+                }
+                return false;
+            }
+        }
+        
+        return false;
+        
+    }
+    
+    
+    /* Funções de aplicação */
     private void fecharAplicacao() {
         System.exit(0);
     }
     
     private void logarAplicacao() {
-        if (txLogin.getText().equals("admin") && txSenha.getText().equals("casadocodigo")) {
-            Timeline timeline = new Timeline(); 
+        
+        if(!checkUserRecords()) {
+            Alert errorLogar = new Alert(AlertType.ERROR);
+            errorLogar.setContentText("Não Existe nenhum usuário na base.");
+            errorLogar.setTitle("Falha na Autenticação");
+            errorLogar.setHeaderText(null);
+            errorLogar.showAndWait();
+        } else if(!checkRegisteredUser(txLogin.getText(), txSenha.getText())) {
+            Alert errorLogar = new Alert(AlertType.ERROR);
+            errorLogar.setContentText("Email ou senha errados.");
+            errorLogar.setTitle("Falha na Autenticação");
+            errorLogar.setHeaderText(null);
+            errorLogar.showAndWait();
+        } else {
+            Timeline.setLoggedUser(getUserFromList(txLogin.getText()));
+            Timeline timeline = new Timeline();
             try {
                 timeline.start(new Stage());
                 Login.stage.close();
-            } catch (Exception e) {
+            } catch(Exception e) {
                 e.printStackTrace();
+                
+                Alert errorLogar = new Alert(AlertType.ERROR);
+                errorLogar.setContentText("Não foi possível conectar o usuário na aplicação. Por favor tente mais tarde...");
+                errorLogar.setTitle("Falha na Autenticação");
+                errorLogar.setHeaderText(null);
+                errorLogar.showAndWait();
             }
-            
-        } else {
-    
-            Alert errorLogar = new Alert(AlertType.ERROR);
-            errorLogar.setContentText("Login e/ou senha inválidos");
-            errorLogar.setTitle("Error");
-            errorLogar.setHeaderText("Falha na Autenticação");
-            errorLogar.showAndWait();
         }
     }
 }

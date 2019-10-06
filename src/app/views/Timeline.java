@@ -20,6 +20,11 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import app.models.Post;
+import app.models.User;
+
+import app.controllers.ListPosts;
+
 /**
  * @author Matheus Maximiano de Melo Vieira
  * @version 1.0.0
@@ -31,12 +36,17 @@ public class Timeline extends Application {
     
     private AnchorPane anchorPane;
     private ImageView logo;
-    private Button btPostar, btSair;
-    private Separator sptrBase;
+    private Label lbUsername;
+    private Button btPostar, btSair, btLike;
+    private Text txContent, txLike;
+    private Separator sptrBase, sprtPost;
     private ScrollPane scrollPane;
-    private Pane paneMain;
+    private Pane paneMain, panePost;
     private Scene scene;
     private static Stage stage;
+    
+    private static User loggedUser;
+    private static ListPosts listPosts;
     
     private void initComponents() throws Exception{
         
@@ -79,9 +89,9 @@ public class Timeline extends Application {
         btPostar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Post post = new Post();
+                NewPost newPost = new NewPost();
                 try {
-                    post.start(new Stage());
+                    newPost.start(new Stage());
                     Timeline.stage.close();
                 } catch(Exception e) {
                     e.printStackTrace();
@@ -153,52 +163,88 @@ public class Timeline extends Application {
         btSair.setCursor(Cursor.HAND);
     }
     
+    /* Iniciadores do PaneMain */
     private void initPaneMain() {
         
         double initLayoutY = 14.0;
         List<Pane> listPanes = new ArrayList<Pane>();
+        listPosts = new ListPosts();
         
-        for(int i = 0; i < 10; i++) {
+        for(Post p : listPosts.getPosts()) {
             
-            Pane panePost = new Pane();
-            panePost.setPrefSize(462, 90);
-            panePost.setLayoutX(16);
-            panePost.setLayoutY(initLayoutY);
-            
-            Label username = new Label("username");
-            username.setLayoutX(21);
-            username.setLayoutY(1);
-            
-            Text postContent = new Text("");
-            postContent.setLayoutX(21);
-            postContent.setLayoutY(40);
-            postContent.setWrappingWidth(400);
-            postContent.setTextAlignment(TextAlignment.JUSTIFY);
-            
-            String text = "The quick brown fox jumps over the lazy dog: "+i;
-            postContent.setText(text);
-        
-            Button like = new Button("Like");
-            like.setLayoutX(21);
-            like.setLayoutY(51);
-            like.setMnemonicParsing(false);
-            
-            Text postLike = new Text("5");
-            postLike.setLayoutX(75);
-            postLike.setLayoutY(68);
-            
-            Separator sprtPost = new Separator();
-            sprtPost.setLayoutX(-15);
-            sprtPost.setLayoutY(84);
-            sprtPost.setPrefSize(495, 3);
+            initComponentsPaneMain(p);
+            initListenersPaneMain(p);
+            initLayoutPaneMain(initLayoutY);
             
             initLayoutY += 95.0;
             
-            panePost.getChildren().addAll(username, postContent, like, postLike, sprtPost);
             listPanes.add(panePost);
+            
         }
         
         paneMain.getChildren().addAll(listPanes);
+    }
+    
+    private void initComponentsPaneMain(Post p) {
+        
+        panePost = new Pane();
+        panePost.setPrefSize(462, 90);
+        
+        String usernameTwitter = "@"+p.getUser().getNome();
+        lbUsername = new Label(usernameTwitter);
+        
+        txContent = new Text();
+        txContent.setWrappingWidth(400);
+        txContent.setTextAlignment(TextAlignment.JUSTIFY);
+        txContent.setText(p.getContent());
+        
+        btLike = new Button("Like");
+        btLike.setMnemonicParsing(false);
+        
+        String stringLikes = ""+p.getLikes()+"";
+        txLike = new Text(stringLikes);
+        
+        sprtPost = new Separator();
+        sprtPost.setPrefSize(495, 3);
+        
+        panePost.getChildren().addAll(lbUsername, txContent, btLike, txLike, sprtPost);
+       
+    }
+    
+    private void initListenersPaneMain(Post p) {
+        
+        btLike.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                p.setLike();
+                String stringLikes = ""+p.getLikes()+"";
+                txLike.setText(stringLikes);
+                paneMain.getChildren().clear();
+                initPaneMain();
+            }
+        });
+        
+    }
+    
+    private void initLayoutPaneMain(double initLayoutY) {
+        
+        panePost.setLayoutX(16);
+        panePost.setLayoutY(initLayoutY);
+        
+        lbUsername.setLayoutX(21);
+        lbUsername.setLayoutY(1);
+        
+        txContent.setLayoutX(21);
+        txContent.setLayoutY(40);
+        
+        btLike.setLayoutX(21);
+        btLike.setLayoutY(51);
+        
+        txLike.setLayoutX(75);
+        txLike.setLayoutY(68);
+        
+        sprtPost.setLayoutX(-15);
+        sprtPost.setLayoutY(84);
     }
     
     @Override
@@ -219,4 +265,16 @@ public class Timeline extends Application {
         Timeline.stage = stage;
     }
     
+    /* Funções Estáticas de Controle */
+    public static void setLoggedUser(User user) {
+        Timeline.loggedUser = user;
+    }
+    
+    public static ListPosts getListPosts() {
+        return Timeline.listPosts;
+    }
+    
+    public static User getLoggedUser() {
+        return Timeline.loggedUser;
+    }
 }
