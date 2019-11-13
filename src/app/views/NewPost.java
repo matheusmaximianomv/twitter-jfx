@@ -1,5 +1,6 @@
 package app.views;
 
+import app.controllers.PostController;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -13,10 +14,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import app.models.Post;
 /**
- *
- * @author Matheus Max
+ * @author Matheus Maximiano de Melo Vieira
+ * @version 1.0.0
+ * @since 2019
  */
 public class NewPost extends Application{
     
@@ -51,7 +52,39 @@ public class NewPost extends Application{
         btPostar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                postar();
+                
+                PostController postMessage = new PostController(taMessage.getText());
+                
+                int result = postMessage.postar();
+                
+                if(result == 1) {
+                    
+                    Alert successPostar = new Alert(Alert.AlertType.CONFIRMATION);
+                    successPostar.setContentText("Postagem realizada com sucesso.");
+                    successPostar.setTitle("Postar");
+                    successPostar.setHeaderText(null);
+                    successPostar.showAndWait();
+                    
+                    Timeline timeline = new Timeline();
+                    try {
+                        timeline.start(new Stage());
+                        NewPost.stage.close();
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                        Alert errorPostar = new Alert(Alert.AlertType.ERROR);
+                        errorPostar.setContentText("Houve um erro interno na postagem. Por Favor tente mais tarde...");
+                        errorPostar.setTitle("Falha em Postar");
+                        errorPostar.setHeaderText(null);
+                        errorPostar.showAndWait();
+                    }
+                } else {
+                    Alert errorPostar = new Alert(Alert.AlertType.ERROR);
+                    errorPostar.setContentText("O campo de texto está vazio.");
+                    errorPostar.setTitle("Falha em Postar");
+                    errorPostar.setHeaderText(null);
+                    errorPostar.showAndWait();
+                }
+                
             }
         });
         
@@ -140,43 +173,5 @@ public class NewPost extends Application{
         
         NewPost.stage = stage;
         
-    }
-    
-    /* Funções Principais */
-    private void postar() {
-        
-        if(taMessage.getText().trim().isEmpty()) {
-            Alert errorPostar = new Alert(Alert.AlertType.ERROR);
-            errorPostar.setContentText("O campo de texto está vazio.");
-            errorPostar.setTitle("Falha em Postar");
-            errorPostar.setHeaderText(null);
-            errorPostar.showAndWait();
-        } else {
-            Alert successPostar = new Alert(Alert.AlertType.CONFIRMATION);
-            successPostar.setContentText("Postagem realizada com sucesso.");
-            successPostar.setTitle("Postar");
-            successPostar.setHeaderText(null);
-            successPostar.showAndWait();
-            
-            Timeline.getListPosts().addPost(createPost());
-            Timeline timeline = new Timeline();
-            try {
-                timeline.start(new Stage());
-                NewPost.stage.close();
-            } catch(Exception e) {
-                e.printStackTrace();
-                Alert errorPostar = new Alert(Alert.AlertType.ERROR);
-                errorPostar.setContentText("Houve um erro interno na postagem> Por Favor tente mais tarde...");
-                errorPostar.setTitle("Falha em Postar");
-                errorPostar.setHeaderText(null);
-                errorPostar.showAndWait();
-            }
-        }
-        
-    }
-    
-    /* Funções Auxiliares */
-    public Post createPost() {
-        return new Post(taMessage.getText(), Timeline.getLoggedUser());
     }
 }

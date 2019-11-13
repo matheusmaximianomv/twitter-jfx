@@ -1,5 +1,6 @@
 package app.views;
 
+import app.controllers.RegisterController;
 import java.io.FileInputStream;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -17,14 +18,16 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import app.models.User;
 /**
- *
- * @author Matheus Max
+ * @author Matheus Maximiano de Melo Vieira
+ * @version 1.0.0
+ * @since 2019
  */
+
 public class Register extends Application {
     
-    private final String PATH_LOGO_TWITTER = "digite_o_caminho\\src\\assets\\img\\twitter-logo.png";
+    private final String PATH_LOGO_TWITTER = "caminho_ate_o_projeto\\src\\assets\\"
+            + "img\\twitter-logo.png";
     
     private AnchorPane pane;
     private Label lbUsername, lbEmail, lbPassword;
@@ -67,7 +70,39 @@ public class Register extends Application {
         btCadastrar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                registerUser();
+                RegisterController register = new RegisterController(txUsername.getText(), txEmail.getText(), txPassword.getText());
+                int registerResult = register.registerUser();
+                
+                
+                if(registerResult == 2) {
+                    
+                    Alert successRegistro = new Alert(Alert.AlertType.CONFIRMATION);
+                    successRegistro.setContentText("Cadastro realizado com sucesso.");
+                    successRegistro.setTitle("Cadastro");
+                    successRegistro.setHeaderText(null);
+                    successRegistro.showAndWait();
+                    
+                    Login login = new Login();
+                    
+                    try {
+                        login.start(new Stage());
+                        Register.stage.close();
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if(registerResult == 1) {
+                    Alert errorRegistro = new Alert(Alert.AlertType.ERROR);
+                    errorRegistro.setContentText("Uma conta com esse email já existe.");
+                    errorRegistro.setTitle("Falha no Cadastro");
+                    errorRegistro.setHeaderText(null);
+                    errorRegistro.showAndWait();
+                } else {
+                    Alert errorRegistro = new Alert(Alert.AlertType.ERROR);
+                    errorRegistro.setContentText("Alguns campos estão vazios.");
+                    errorRegistro.setTitle("Falha no Cadastro");
+                    errorRegistro.setHeaderText(null);
+                    errorRegistro.showAndWait();
+                }
             }
         });
         
@@ -180,58 +215,4 @@ public class Register extends Application {
         
     }
     
-    /* Funções da Aplicação */
-    private void registerUser() {
-        if(!isValidFields()) {
-            Alert errorRegistro = new Alert(Alert.AlertType.ERROR);
-            errorRegistro.setContentText("Alguns campos estão vazios.");
-            errorRegistro.setTitle("Falha no Cadastro");
-            errorRegistro.setHeaderText(null);
-            errorRegistro.showAndWait();
-        } else if(!checkUserValid()) {
-            Alert errorRegistro = new Alert(Alert.AlertType.ERROR);
-            errorRegistro.setContentText("Uma conta com esse email já existe.");
-            errorRegistro.setTitle("Falha no Cadastro");
-            errorRegistro.setHeaderText(null);
-            errorRegistro.showAndWait();
-        } else {
-            Alert successRegistro = new Alert(Alert.AlertType.CONFIRMATION);
-            successRegistro.setContentText("Cadastro realizado com sucesso.");
-            successRegistro.setTitle("Cadastro");
-            successRegistro.setHeaderText(null);
-            successRegistro.showAndWait();
-            
-            Login.getListUsers().addUser(createUser());
-            Login login = new Login();
-            try {
-                login.start(new Stage());
-                Register.stage.close();
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-            
-        }
-    }
-    
-    /* Funções Auxiliares */
-    private boolean isValidFields() {
-        if(txEmail.getText().trim().isEmpty() || txPassword.getText().trim().isEmpty() || txUsername.getText().trim().isEmpty()) {
-            return false;
-        }
-        return true;
-    }
-    
-    private boolean checkUserValid() {
-        for(User u : Login.getListUsers().getUsers()) {
-            if(u.getEmail().equals(txEmail.getText())) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
-    
-    private User createUser() {
-        return new User(Login.getListUsers().getRecords(),txEmail.getText(), txPassword.getText(), txUsername.getText());
-    }
 }

@@ -16,9 +16,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 
-import app.models.User;
-
-import app.controllers.ListUsers;
+import app.controllers.LoginController;
 
 /**
  * @author Matheus Maximiano de Melo Vieira
@@ -27,7 +25,8 @@ import app.controllers.ListUsers;
  */
 public class Login extends Application {
 
-    private final String PATH_LOGO_TWITTER = "digite_o_caminho\\src\\assets\\img\\twitter-logo.png";
+    private final String PATH_LOGO_TWITTER = "caminho_ate_o_projeto\\src\\assets\\"
+            + "img\\twitter-logo.png";
     
     private AnchorPane pane;
     private TextField txLogin;
@@ -36,7 +35,7 @@ public class Login extends Application {
     private ImageView logo;
     private static Stage stage;
     
-    private static ListUsers listUsers;
+    private LoginController auth = new LoginController();
     
     @Override
     public void start(Stage stage) throws Exception {
@@ -51,8 +50,7 @@ public class Login extends Application {
         stage.setTitle("Twitter");
         stage.show();
         
-        initLayout();  
-        initUser();
+        initLayout();
         
         Login.stage = stage;
     }
@@ -123,7 +121,36 @@ public class Login extends Application {
         btEntrar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                logarAplicacao();
+                
+                int result = auth.logarAplicacao(txLogin.getText(), txSenha.getText()); 
+                
+                if(result == 2) {
+                    Timeline timeline = new Timeline();
+                    try {
+                        timeline.start(new Stage());
+                        Login.stage.close();
+                    } catch(Exception e) {
+                        e.printStackTrace();
+
+                        Alert errorLogar = new Alert(AlertType.ERROR);
+                        errorLogar.setContentText("Não foi possível conectar o usuário na aplicação. Por favor tente mais tarde...");
+                        errorLogar.setTitle("Falha na Autenticação");
+                        errorLogar.setHeaderText(null);
+                        errorLogar.showAndWait();
+                    }
+                } else if(result == 1) {
+                    Alert errorLogar = new Alert(Alert.AlertType.ERROR);
+                    errorLogar.setContentText("Email ou senha errados.");
+                    errorLogar.setTitle("Falha na Autenticação");
+                    errorLogar.setHeaderText(null);
+                    errorLogar.showAndWait();
+                } else {
+                    Alert errorLogar = new Alert(Alert.AlertType.ERROR);
+                    errorLogar.setContentText("Não Existe nenhum usuário na base.");
+                    errorLogar.setTitle("Falha na Autenticação");
+                    errorLogar.setHeaderText(null);
+                    errorLogar.showAndWait();
+                }
             }
         });
         
@@ -161,9 +188,6 @@ public class Login extends Application {
         
         // Mudando a estilização quando o mouse sai de cima do botão
         btCadastrar.setOnMouseExited(e -> {
-            /*setStyleInButton(btSair, "-fx-background-color: white; "
-                    + "-fx-background-radius:10px; -fx-border-radius: 10px; "
-                    + "-fx-border-color:#1da1f2; -fx-text-fill:#1da1f2");*/
             btCadastrar.setStyle("-fx-background-color: white; -fx-background-radius:10px;"
                 + "-fx-border-radius: 10px; -fx-border-color:#1da1f2; -fx-text-fill:#1da1f2");
         });
@@ -172,7 +196,7 @@ public class Login extends Application {
         btSair.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                fecharAplicacao();
+                auth.fecharAplicacao();
             }
         });
         
@@ -184,104 +208,13 @@ public class Login extends Application {
         
         // Mudando a estilização quando o mouse sai de cima do botão
         btSair.setOnMouseExited(e -> {
-            /*setStyleInButton(btSair, "-fx-background-color: white; "
-                    + "-fx-background-radius:10px; -fx-border-radius: 10px; "
-                    + "-fx-border-color:#1da1f2; -fx-text-fill:#1da1f2");*/
             btSair.setStyle("-fx-background-color: white; -fx-background-radius:10px;"
                 + "-fx-border-radius: 10px; -fx-border-color:#1da1f2; -fx-text-fill:#1da1f2");
         });
     }
     
-    private void initUser() {
-        
-        listUsers = new ListUsers();
-        User userAdmin = new User(listUsers.getRecords(), "admin@email.com", "javafx", "Matheus Max");
-        listUsers.addUser(userAdmin);
-        
-    }
-    
     public static void main(String[] args) {
         launch(args);
     }
-    
-    /* Função Estática da Base de Usuários */
-    public static ListUsers getListUsers() {
-        return Login.listUsers;
-    }
-    
-    /* Funções Auxiliares */
-    private void setStyleInButton(Button button, String style) {
-        button.setStyle(style);
-    }
-    
-    private User getUserFromList(String email) {
-        for(User u : listUsers.getUsers()) {
-            if(u.getEmail().equals(email)) {
-                return u;
-            }
-        }
-        
-        return null;
-    }
-    
-    /* Funções para Autenticação */
-    private boolean checkUserRecords() {
-        if(listUsers.getRecords() == 0) {
-            return false;
-        }
-        return true;
-    }
-    
-    private boolean checkRegisteredUser(String email, String senha) {
-        
-        for(User u : listUsers.getUsers()) {
-            if(u.getEmail().equals(email)) {
-                if(u.getSenha().equals(senha)) {
-                    return true;
-                }
-                return false;
-            }
-        }
-        
-        return false;
-        
-    }
-    
-    
-    /* Funções de aplicação */
-    private void fecharAplicacao() {
-        System.exit(0);
-    }
-    
-    private void logarAplicacao() {
-        
-        if(!checkUserRecords()) {
-            Alert errorLogar = new Alert(AlertType.ERROR);
-            errorLogar.setContentText("Não Existe nenhum usuário na base.");
-            errorLogar.setTitle("Falha na Autenticação");
-            errorLogar.setHeaderText(null);
-            errorLogar.showAndWait();
-        } else if(!checkRegisteredUser(txLogin.getText(), txSenha.getText())) {
-            Alert errorLogar = new Alert(AlertType.ERROR);
-            errorLogar.setContentText("Email ou senha errados.");
-            errorLogar.setTitle("Falha na Autenticação");
-            errorLogar.setHeaderText(null);
-            errorLogar.showAndWait();
-        } else {
-            Timeline.setLoggedUser(getUserFromList(txLogin.getText()));
-            Timeline timeline = new Timeline();
-            try {
-                timeline.start(new Stage());
-                Login.stage.close();
-            } catch(Exception e) {
-                e.printStackTrace();
-                
-                Alert errorLogar = new Alert(AlertType.ERROR);
-                errorLogar.setContentText("Não foi possível conectar o usuário na aplicação. Por favor tente mais tarde...");
-                errorLogar.setTitle("Falha na Autenticação");
-                errorLogar.setHeaderText(null);
-                errorLogar.showAndWait();
-            }
-        }
-    }
+
 }

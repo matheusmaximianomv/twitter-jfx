@@ -20,10 +20,11 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import app.models.Post;
-import app.models.User;
-
 import app.controllers.ListPosts;
+
+import app.models.Post;
+
+import database.Database;
 
 /**
  * @author Matheus Maximiano de Melo Vieira
@@ -32,7 +33,8 @@ import app.controllers.ListPosts;
  */
 public class Timeline extends Application {
     
-    private final String PATH_LOGO_TWITTER = "digite_o_caminho\\src\\assets\\img\\twitter-logo.png";
+    private final String PATH_LOGO_TWITTER = "caminho_ate_o_projeto\\src\\assets\\"
+            + "img\\twitter-logo.png";
     
     private AnchorPane anchorPane;
     private ImageView logo;
@@ -44,9 +46,6 @@ public class Timeline extends Application {
     private Pane paneMain, panePost;
     private Scene scene;
     private static Stage stage;
-    
-    private static User loggedUser;
-    private static ListPosts listPosts;
     
     private void initComponents() throws Exception{
         
@@ -168,7 +167,7 @@ public class Timeline extends Application {
         
         double initLayoutY = 14.0;
         List<Pane> listPanes = new ArrayList<Pane>();
-        listPosts = new ListPosts();
+        ListPosts listPosts = Database.getListPosts();
         
         for(Post p : listPosts.getPosts()) {
             
@@ -265,16 +264,4 @@ public class Timeline extends Application {
         Timeline.stage = stage;
     }
     
-    /* Funções Estáticas de Controle */
-    public static void setLoggedUser(User user) {
-        Timeline.loggedUser = user;
-    }
-    
-    public static ListPosts getListPosts() {
-        return Timeline.listPosts;
-    }
-    
-    public static User getLoggedUser() {
-        return Timeline.loggedUser;
-    }
 }
