@@ -28,9 +28,7 @@ import utils.enums.Results;
 
 public class Register extends Application {
     
-    private final String PATH_LOGO_TWITTER = "C:\\Users\\Matheus Max\\"
-            + "Documents\\NetBeansProjects\\Twitter\\src\\assets\\"
-            + "img\\twitter-logo.png";
+    private final String PATH_LOGO_TWITTER = "digite_o_caminho\\src\\assets\\img\\twitter-logo.png";
     
     private AnchorPane pane;
     private Label lbUsername, lbEmail, lbPassword;

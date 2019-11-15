@@ -33,9 +33,7 @@ import app.controllers.UserController;
  */
 public class Timeline extends Application {
     
-    private final String PATH_LOGO_TWITTER = "C:\\Users\\Matheus Max\\"
-            + "Documents\\NetBeansProjects\\Twitter\\src\\assets\\"
-            + "img\\twitter-logo.png";
+    private final String PATH_LOGO_TWITTER = "digite_o_caminho\\src\\assets\\img\\twitter-logo.png";
     
     private AnchorPane anchorPane;
     private ImageView logo;
