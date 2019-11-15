@@ -3,10 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Matheus%20Max/Documents/NetBeansProjects/Twitter/src/app/controllers/ListUsers.java</file>
-            <file>file:/C:/Users/Matheus%20Max/Documents/NetBeansProjects/Twitter/src/app/views/Timeline.java</file>
-            <file>file:/C:/Users/Matheus%20Max/Documents/NetBeansProjects/Twitter/src/app/models/User.java</file>
-            <file>file:/C:/Users/Matheus%20Max/Documents/NetBeansProjects/Twitter/src/app/models/Post.java</file>
+            <file>file:/C:/Users/Matheus%20Max/Documents/NetBeansProjects/Twitter/src/app/views/NewPost.java</file>
+            <file>file:/C:/Users/Matheus%20Max/Documents/NetBeansProjects/Twitter/src/app/controllers/UserController.java</file>
         </group>
     </open-files>
 </project-private>

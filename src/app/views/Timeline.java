@@ -20,10 +20,11 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import app.models.Post;
-import app.models.User;
+import app.controllers.PostController;
 
-import app.controllers.ListPosts;
+import app.models.Post;
+
+import app.controllers.UserController;
 
 /**
  * @author Matheus Maximiano de Melo Vieira
@@ -32,7 +33,9 @@ import app.controllers.ListPosts;
  */
 public class Timeline extends Application {
     
-    private final String PATH_LOGO_TWITTER = "digite_o_caminho\\src\\assets\\img\\twitter-logo.png";
+    private final String PATH_LOGO_TWITTER = "C:\\Users\\Matheus Max\\"
+            + "Documents\\NetBeansProjects\\Twitter\\src\\assets\\"
+            + "img\\twitter-logo.png";
     
     private AnchorPane anchorPane;
     private ImageView logo;
@@ -44,9 +47,8 @@ public class Timeline extends Application {
     private Pane paneMain, panePost;
     private Scene scene;
     private static Stage stage;
-    
-    private static User loggedUser;
-    private static ListPosts listPosts;
+    private PostController postController = new PostController();
+    private List<Post> listPosts = new ArrayList<Post>();
     
     private void initComponents() throws Exception{
         
@@ -168,9 +170,10 @@ public class Timeline extends Application {
         
         double initLayoutY = 14.0;
         List<Pane> listPanes = new ArrayList<Pane>();
-        listPosts = new ListPosts();
         
-        for(Post p : listPosts.getPosts()) {
+        listPosts = postController.listarPostagens();
+        
+        for(Post p : listPosts) {
             
             initComponentsPaneMain(p);
             initListenersPaneMain(p);
@@ -216,10 +219,16 @@ public class Timeline extends Application {
         btLike.setOnAction(new EventHandler<ActionEvent>(){
             @Override
             public void handle(ActionEvent event) {
+                
                 p.setLike();
+                postController.likePost(p);
+                
                 String stringLikes = ""+p.getLikes()+"";
                 txLike.setText(stringLikes);
+                
+                listPosts.clear();
                 paneMain.getChildren().clear();
+                
                 initPaneMain();
             }
         });
@@ -265,16 +274,4 @@ public class Timeline extends Application {
         Timeline.stage = stage;
     }
     
-    /* Funções Estáticas de Controle */
-    public static void setLoggedUser(User user) {
-        Timeline.loggedUser = user;
-    }
-    
-    public static ListPosts getListPosts() {
-        return Timeline.listPosts;
-    }
-    
-    public static User getLoggedUser() {
-        return Timeline.loggedUser;
-    }
 }
